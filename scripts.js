@@ -173,6 +173,18 @@ function formatProduct(product, quantity = undefined) {
  */
 function cartInfo(cart) {
   /* Útfæra */
+  if (!Array.isArray(cart) || !cart.length) {
+    console.error('Cart is empty or not defined.');
+    return;
+  }
+  
+  let cartDetails = '';
+  for (const item of cart) {
+    // Your logic here. E.g.
+    cartDetails += `${item.productName} — ${formatPrice(item.price)} kr.\n`;
+  }
+
+  console.info(cartDetails);
 }
 
 // --------------------------------------------------------
@@ -312,12 +324,24 @@ function addProductToCart() {
 
   let productInCart = cart.lines.find((i) => i.product.id === productId);
 
-  if (productInCart) {
-    productInCart.quantity += 1;
-  } else {
-    const newLine = { product, quantity: 1}
-    cart.lines.push(newLine)
-    }
+if (productInCart) {
+  productInCart.quantity += 1;
+} else {
+  const newLine = { product, quantity: 1 };
+  cart.lines.push(newLine);
+}
+
+let total = 0;
+for (const line of cart.lines) {
+  total += line.product.price * line.quantity;
+}
+
+const formattedPrice = formatPrice(product.price);
+const formattedTotal = formatPrice(total);
+
+console.info(`Vöru bætt við körfu:\n${product.title} - ${formattedPrice} kr. - samtals ${formattedTotal} kr.`);
+
+
   }
 
 
@@ -335,6 +359,8 @@ function addProductToCart() {
  */
 function showCart() {
   /* Útfæra */
+  const cartDetails = cartInfo(cart);
+  console.info(`Your Cart:\n${cartDetails}`);
 }
 
 /**
