@@ -307,7 +307,7 @@ function addProductToCart() {
 
   // TODO validatea að þetta sé í raun tala sem er vara og ekki null
   if (!productIdasString) {
-    console.error('Verður að vera tala')
+    console.error('Auðkenni vöru er ekki löglegt, verður að vera heiltala sem er stærri en 0')
     return;
   }
 
@@ -360,7 +360,7 @@ console.info(`Vöru bætt við körfu:\n${product.title} - ${formattedPrice} kr.
 function showCart() {
   /* Útfæra */
   const cartDetails = cartInfo(cart);
-  console.info(`Your Cart:\n${cartDetails}`);
+  console.info(`Karfan þín:\n${cartDetails}`);
 }
 
 /**
@@ -383,4 +383,22 @@ function showCart() {
  */
 function checkout() {
   /* Útfæra */
-}
+  const cartDetails = cartInfo(cart);
+
+  // Calculate total price of all products in the cart
+  let total = 0;
+  for (const line of cart.lines) {
+    total += line.product.price * line.quantity;
+  }
+
+  const formattedTotal = formatPrice(total);
+
+  if (confirm(`Ertu viss um að þú viljir klára kaupin?\n${cartDetails}\nSamtals: ${formattedTotal} kr.`)) {
+    console.info(`Kaup lokið:\n${cartDetails}\nSamtals: ${formattedTotal} kr.`);
+    
+    // Empty the cart after a successful checkout
+    cart.lines = [];
+  } else {
+    console.info('Kaup hætt');
+  }
+  }
