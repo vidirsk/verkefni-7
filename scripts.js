@@ -121,11 +121,11 @@ const cart = {
  * const price = formatPrice(123000);
  * console.log(price); // Skrifar út `123.000 kr.`
  * @param {number} price Verð til að sníða.
- * @returns Verð sniðið með íslenskum krónu.
+ * @returns {string} Verð sniðið með íslenskum krónu.
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
  */
 function formatPrice(price) {
-  return price;
+  return price.toString();
 }
 
 /**
@@ -286,12 +286,36 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
-  /* Útfæra */
+  debugger;
+  const productIdasString = prompt('Auðkenni vöru sem á að bæta við körfu:')
 
-  /* Hér ætti að nota `validateInteger` hjálparfall til að staðfesta gögn frá notanda */
-  
-  /* Til að athuga hvort vara sé til í `cart` þarf að nota `cart.lines.find` */
-}
+  // TODO validatea að þetta sé í raun tala sem er vara og ekki null
+  if (!productIdasString) {
+    console.error('Verður að vera tala')
+    return;
+  }
+
+  const productId = Number.parseInt(productIdasString);
+  console.log(productId)
+
+  const product = products.find((i) => i.id === productId)
+
+  if (!product) {
+    console.error('Vara fannst ekki');
+    return;
+  }
+
+
+  let productInCart = cart.lines.find((i) => i.product.id === productId);
+
+  if (productInCart) {
+    productInCart.quantity += 1;
+  } else {
+    const newLine = { product, quantity: 1}
+    cart.lines.push(newLine)
+    }
+  }
+
 
 /**
  * Birta upplýsingar um körfu í console. Ef ekkert er í körfu er „Karfan er tóm.“ birt, annars
