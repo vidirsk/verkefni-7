@@ -173,15 +173,17 @@ function formatProduct(product, quantity = undefined) {
  */
 function cartInfo(cart) {
   /* Útfæra */
-  if (!Array.isArray(cart) || !cart.length) {
-    console.error('Cart is empty or not defined.');
+  if (!cart || !Array.isArray(cart.lines) || !cart.lines.length) {
+    console.error('Karfan er tóm');
     return;
   }
-  
+
+  console.log(cart);
+
   let cartDetails = '';
-  for (const item of cart) {
-    // Your logic here. E.g.
-    cartDetails += `${item.productName} — ${formatPrice(item.price)} kr.\n`;
+  for (const item of cart.lines) {
+    const totalItemPrice = item.quantity * item.product.price;
+    cartDetails += `${item.product.title} — ${item.quantity}x${formatPrice(item.product.price)} kr. samtals ${formatPrice(totalItemPrice)} kr.\n`;
   }
 
   console.info(cartDetails);
@@ -383,6 +385,17 @@ function showCart() {
  */
 function checkout() {
   /* Útfæra */
+  const title = prompt('Nafn:');
+  if (!title) {
+    console.error('Nafn má ekki vera tómt.');
+    return;
+  }
+
+  const description = prompt('Heimilisfang:');
+  if (!description) {
+    console.error('Heimilisfang má ekki vera tót.');
+    return;
+  }
   const cartDetails = cartInfo(cart);
 
   // Calculate total price of all products in the cart
@@ -394,11 +407,10 @@ function checkout() {
   const formattedTotal = formatPrice(total);
 
   if (confirm(`Ertu viss um að þú viljir klára kaupin?\n${cartDetails}\nSamtals: ${formattedTotal} kr.`)) {
-    console.info(`Kaup lokið:\n${cartDetails}\nSamtals: ${formattedTotal} kr.`);
+    console.info(`Pöntun móttekin ${title}.\nVörur verða sendar á ${description}.\n ${cartDetails}\nSamtals: ${formattedTotal} kr.`);
     
-    // Empty the cart after a successful checkout
     cart.lines = [];
   } else {
-    console.info('Kaup hætt');
+    console.info('Hætt við kaup');
   }
   }
