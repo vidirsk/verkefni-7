@@ -125,7 +125,7 @@ const cart = {
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl
  */
 function formatPrice(price) {
-  return price.toString();
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 /**
@@ -268,9 +268,9 @@ function addProduct() {
 function showProducts() {
   /* Útfæra */
   /* Hér ætti að nota `formatPrice` hjálparfall */
-  let productInfo = 'Vörur í boði:\n';
+  let productInfo = '';
   for(let i = 0; i < products.length; i++) {
-    productInfo += `${i+1}. ${products[i].title} — ${formatPrice(products[i].price)}\n`;
+    productInfo += `${i+1}. ${products[i].title} - ${products[i].description} — ${formatPrice(products[i].price)} kr.\n`;
   }
   console.info(productInfo);
 }
