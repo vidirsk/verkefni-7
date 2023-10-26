@@ -268,6 +268,11 @@ function addProduct() {
 function showProducts() {
   /* Útfæra */
   /* Hér ætti að nota `formatPrice` hjálparfall */
+  let productInfo = 'Vörur í boði:\n';
+  for(let i = 0; i < products.length; i++) {
+    productInfo += `${i+1}. ${products[i].title} — ${formatPrice(products[i].price)}\n`;
+  }
+  console.info(productInfo);
 }
 
 /**
@@ -286,7 +291,6 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
-  debugger;
   const productIdasString = prompt('Auðkenni vöru sem á að bæta við körfu:')
 
   // TODO validatea að þetta sé í raun tala sem er vara og ekki null
