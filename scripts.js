@@ -172,22 +172,19 @@ function formatProduct(product, quantity = undefined) {
  * @returns Streng sem inniheldur upplýsingar um körfu.
  */
 function cartInfo(cart) {
-  /* Útfæra */
   if (!cart || !Array.isArray(cart.lines) || !cart.lines.length) {
     console.error('Karfan er tóm');
-    return;
+    return 'Karfan er tóm';
   }
-
-  console.log(cart);
 
   let cartDetails = '';
   for (const item of cart.lines) {
     const totalItemPrice = item.quantity * item.product.price;
     cartDetails += `${item.product.title} — ${item.quantity}x${formatPrice(item.product.price)} kr. samtals ${formatPrice(totalItemPrice)} kr.\n`;
   }
-
-  console.info(cartDetails);
+  return cartDetails;
 }
+
 
 // --------------------------------------------------------
 // Föll fyrir forritið
@@ -418,7 +415,6 @@ function showCart() {
  * @returns undefined
  */
 function checkout() {
-  /* Útfæra */
   const title = prompt('Nafn:');
   if (!title) {
     console.error('Nafn má ekki vera tómt.');
@@ -430,7 +426,12 @@ function checkout() {
     console.error('Heimilisfang má ekki vera tót.');
     return;
   }
-  const cartDetails = cartInfo(cart);
+  
+  let cartDetails = cartInfo(cart);
+  if(cartDetails === 'Karfan er tóm') {
+    console.error(cartDetails);
+    return;
+  }
 
   let total = 0;
   for (const line of cart.lines) {
@@ -439,11 +440,12 @@ function checkout() {
 
   const formattedTotal = formatPrice(total);
 
-  if (confirm(`Ertu viss um að þú viljir klára kaupin?\n${cartDetails}\nSamtals: ${formattedTotal} kr.`)) {
-    console.info(`Pöntun móttekin ${title}.\nVörur verða sendar á ${description}.\n ${cartDetails}\nSamtals: ${formattedTotal} kr.`);
+  if (confirm(`Ertu viss um að þú viljir klára kaupin?\n${cartDetails}Samtals: ${formattedTotal} kr.`)) {
+    console.info(`Pöntun móttekin ${title}.\nVörur verða sendar á ${description}.\n\n${cartDetails}Samtals: ${formattedTotal} kr.`);
 
     cart.lines = [];
   } else {
     console.info('Hætt við kaup');
   }
-  }
+}
+
