@@ -157,7 +157,7 @@ function formatProduct(product, quantity = undefined) {
 
 
   }
-  return `${product.title} - ${product.price}`; 
+  return `${product.title} - ${formatPrice(product.price)} kr.`; 
 }
 
 /**
@@ -280,8 +280,6 @@ function addProduct() {
  * @returns undefined
  */
 function showProducts() {
-  /* Útfæra */
-  /* Hér ætti að nota `formatPrice` hjálparfall */
   let productInfo = '';
   for(let i = 0; i < products.length; i++) {
     productInfo += `${i+1}. ${products[i].title} - ${products[i].description} — ${formatPrice(products[i].price)} kr.\n`;
@@ -305,10 +303,9 @@ function showProducts() {
  * @returns undefined
  */
 function addProductToCart() {
-  const productIdasString = prompt('Auðkenni vöru sem á að bæta við körfu:')
+  const productIdasString = prompt('Sláðu inn auðkenni (ID) á vöru sem þú vilt bæta í körfu:')
 
-  // TODO validatea að þetta sé í raun tala sem er vara og ekki null
-  if (!productIdasString) {
+  if (!productIdasString || isNaN(Number(productIdasString)) || Number(productIdasString) <= 0) {
     console.error('Auðkenni vöru er ekki löglegt, verður að vera heiltala sem er stærri en 0')
     return;
   }
@@ -323,28 +320,39 @@ function addProductToCart() {
     return;
   }
 
+  const quantityAsString = prompt('Sláðu inn fjölda sem þú vilt bæta í körfu:');
+  
+  if (!quantityAsString || isNaN(Number(quantityAsString)) || Number(quantityAsString) < 1 || Number(quantityAsString) > 99) {
+    console.error('Fjöldi er ekki löglegur, lágmark 1 og hámark 99.');
+    return;
+  }
+  
+  const quantity = Number.parseInt(quantityAsString);
+
 
   let productInCart = cart.lines.find((i) => i.product.id === productId);
 
-if (productInCart) {
-  productInCart.quantity += 1;
-} else {
-  const newLine = { product, quantity: 1 };
-  cart.lines.push(newLine);
-}
-
-let total = 0;
-for (const line of cart.lines) {
-  total += line.product.price * line.quantity;
-}
-
-const formattedPrice = formatPrice(product.price);
-const formattedTotal = formatPrice(total);
-
-console.info(`Vöru bætt við körfu:\n${product.title} - ${formattedPrice} kr. - samtals ${formattedTotal} kr.`);
-
-
+  if (productInCart) {
+    productInCart.quantity += quantity;
+    console.info('Vöru fjöldi uppfærður:');
+  } else {
+    const newLine = { product, quantity };
+    cart.lines.push(newLine);
+    console.info('Vöru bætt við körfu:');
   }
+
+  let total = 0;
+  for (const line of cart.lines) {
+    total += line.product.price * line.quantity;
+  }
+
+  const formattedPrice = formatPrice(product.price);
+  const formattedTotal = formatPrice(total);
+
+  console.info(`\n${product.title} - ${quantity}x${formattedPrice} kr. - samtals ${formattedTotal} kr.`);
+}
+
+  
 
 
 /**
@@ -360,9 +368,35 @@ console.info(`Vöru bætt við körfu:\n${product.title} - ${formattedPrice} kr.
  * @returns undefined
  */
 function showCart() {
-  /* Útfæra */
-  const cartDetails = cartInfo(cart);
-  console.info(`Karfan þín:\n${cartDetails}`);
+  if (cart.lines.length === 0) {
+    console.info('Karfan er tóm.');
+    return;
+  }
+
+  let output = '';
+  let total = 0;
+
+  for (const line of cart.lines) {
+    const quantity = line.quantity;
+    const product = line.product;
+    const lineTotal = product.price * quantity;
+
+    total += lineTotal;
+
+    const formattedLineTotal = formatPrice(lineTotal);
+    const formattedPrice = formatPrice(product.price);
+
+    if (quantity > 1) {
+      output += `${product.title} — ${quantity}x${formattedPrice} kr. samtals ${formattedLineTotal} kr.\n`;
+    } else {
+      output += `${product.title} — ${formattedPrice} kr.\n`;
+    }
+  }
+
+  const formattedTotal = formatPrice(total);
+  output += `Samtals: ${formattedTotal} kr.`;
+
+  console.info(`Karfan þín:\n${output}`);
 }
 
 /**
@@ -398,7 +432,6 @@ function checkout() {
   }
   const cartDetails = cartInfo(cart);
 
-  // Calculate total price of all products in the cart
   let total = 0;
   for (const line of cart.lines) {
     total += line.product.price * line.quantity;
@@ -408,7 +441,7 @@ function checkout() {
 
   if (confirm(`Ertu viss um að þú viljir klára kaupin?\n${cartDetails}\nSamtals: ${formattedTotal} kr.`)) {
     console.info(`Pöntun móttekin ${title}.\nVörur verða sendar á ${description}.\n ${cartDetails}\nSamtals: ${formattedTotal} kr.`);
-    
+
     cart.lines = [];
   } else {
     console.info('Hætt við kaup');
